@@ -1,14 +1,10 @@
-import { useState } from 'react'
+import { BrowserRouter } from 'react-router-dom';
+import AppRoutes from './routes/AppRoutes';
 
-function App() {
-  const [count, setCount] = useState(0);
-  console.log("process.env.NAME",import.meta.env.VITE_NAME);
+const App = () => (
+  <BrowserRouter>
+    <AppRoutes />
+  </BrowserRouter>
+);
 
-  return (
-    <>
-      <h2 className='text-2xl text-blue-500'>Hello World</h2>
-    </>
-  )
-}
-
-export default App
+export default App;
