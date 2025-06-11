@@ -5,6 +5,7 @@ import {
   signupAPI,
   type AuthCredentials,
   type AuthResponse,
+  type signUpResponse,
   type SignupUser,
 } from "./authApi";
 
@@ -22,7 +23,7 @@ export const loginUser = createAsyncThunk<AuthResponse, AuthCredentials>(
   }
 );
 
-export const signupUser = createAsyncThunk<AuthResponse, SignupUser>(
+export const signupUser = createAsyncThunk<signUpResponse, SignupUser>(
   "auth/signupUser",
   async (data, thunkAPI) => {
     try {
@@ -37,8 +38,13 @@ export const signupUser = createAsyncThunk<AuthResponse, SignupUser>(
 
 // State type
 interface AuthState {
-  user: { id: number; email: string } | null;
+  user: SignupUser | null;
   token: string | null;
+  loading: boolean;
+  error: string | null;
+}
+
+interface signupState extends signUpResponse {
   loading: boolean;
   error: string | null;
 }
@@ -74,9 +80,9 @@ const authSlice = createSlice({
         loginUser.fulfilled,
         (state, action: PayloadAction<AuthResponse>) => {
           state.loading = false;
-          state.user = action.payload.user;
-          state.token = action.payload.token;
-          localStorage.setItem("token", action.payload.token);
+          state.user = action.payload.data.user;
+          state.token = action.payload.data.token;
+          localStorage.setItem("token", action.payload.data.token);
         }
       )
       .addCase(loginUser.rejected, (state, action) => {
@@ -91,11 +97,10 @@ const authSlice = createSlice({
       })
       .addCase(
         signupUser.fulfilled,
-        (state, action: PayloadAction<AuthResponse>) => {
+        (state, action: PayloadAction<signUpResponse>) => {
+          console.log("action.payload");
           state.loading = false;
-          state.user = action.payload.user;
-          state.token = action.payload.token;
-          localStorage.setItem("token", action.payload.token);
+          state.user = action.payload.data.data;
         }
       )
       .addCase(signupUser.rejected, (state, action) => {

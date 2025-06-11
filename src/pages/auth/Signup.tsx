@@ -29,7 +29,7 @@ const Signup: React.FC = () => {
     try {
       const result = await dispatch(signupUser(form)).unwrap();
       console.log("Signup successful:", result);
-      navigate("/dashboard");
+      // navigate("/dashboard");
     } catch (err) {
       console.error("Signup failed:", err);
     }

@@ -7,6 +7,7 @@ export interface AuthCredentials {
 }
 
 export interface SignupUser {
+  // id: number;
   firstName: string;
   middleName?: string;
   lastName?: string;
@@ -15,8 +16,20 @@ export interface SignupUser {
 }
 
 export interface AuthResponse {
-  user: { id: number; email: string };
-  token: string;
+  data: {
+    user: SignupUser;
+    token: string;
+    message: string;
+    status: string;
+  };
+}
+
+export interface signUpResponse {
+  data: {
+    data: SignupUser;
+    message: string;
+    status: string;
+  };
 }
 
 // login
@@ -25,14 +38,21 @@ export const loginAPI = async ({
   password,
 }: AuthCredentials): Promise<AuthResponse> => {
   await new Promise((res) => setTimeout(res, 500)); // simulate delay
-  return {
-    user: { id: 1, email },
-    token: "mock-token-123",
-  };
+  const response = await axiosInstance.post<AuthResponse>("/api/auth/login", {
+    email,
+    password,
+  });
+
+  return response.data;
 };
 
 // signup
-export const signupAPI = async (data: SignupUser): Promise<AuthResponse> => {
-  const response = await axiosInstance.post<AuthResponse>("/auth/signup", data);
+export const signupAPI = async (data: SignupUser): Promise<signUpResponse> => {
+  const response = await axiosInstance.post<signUpResponse>(
+    "/api/auth/signup",
+    data
+  );
+
+  console.log("response from signup:: ", response);
   return response.data;
 };
