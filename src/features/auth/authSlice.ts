@@ -80,9 +80,9 @@ const authSlice = createSlice({
         loginUser.fulfilled,
         (state, action: PayloadAction<AuthResponse>) => {
           state.loading = false;
-          state.user = action.payload.data.user;
-          state.token = action.payload.data.token;
-          localStorage.setItem("token", action.payload.data.token);
+          state.user = action.payload.data;
+          state.token = action.payload.token;
+          localStorage.setItem("token", action.payload.token);
         }
       )
       .addCase(loginUser.rejected, (state, action) => {
@@ -98,7 +98,6 @@ const authSlice = createSlice({
       .addCase(
         signupUser.fulfilled,
         (state, action: PayloadAction<signUpResponse>) => {
-          console.log("action.payload");
           state.loading = false;
           state.user = action.payload.data.data;
         }

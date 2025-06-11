@@ -16,12 +16,9 @@ export interface SignupUser {
 }
 
 export interface AuthResponse {
-  data: {
-    user: SignupUser;
-    token: string;
-    message: string;
-    status: string;
-  };
+  data: SignupUser;
+  token: string;
+  status: string;
 }
 
 export interface signUpResponse {
