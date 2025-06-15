@@ -1,63 +1,91 @@
+// features/auth/authSlice.ts
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-import {
-  loginAPI,
-  signupAPI,
-  type AuthCredentials,
-  type AuthResponse,
-  type signUpResponse,
-  type SignupUser,
-} from "./authApi";
-
-// Thunks
-export const loginUser = createAsyncThunk<AuthResponse, AuthCredentials>(
-  "auth/loginUser",
-  async (credentials, thunkAPI) => {
-    try {
-      return await loginAPI(credentials);
-    } catch (err: any) {
-      return thunkAPI.rejectWithValue(
-        err.response?.data?.message || err.message
-      );
-    }
-  }
-);
-
-export const signupUser = createAsyncThunk<signUpResponse, SignupUser>(
-  "auth/signupUser",
-  async (data, thunkAPI) => {
-    try {
-      return await signupAPI(data);
-    } catch (err: any) {
-      return thunkAPI.rejectWithValue(
-        err.response?.data?.message || err.message
-      );
-    }
-  }
-);
-
-// State type
-interface AuthState {
-  user: SignupUser | null;
-  token: string | null;
-  loading: boolean;
-  error: string | null;
-}
-
-interface signupState extends signUpResponse {
-  loading: boolean;
-  error: string | null;
-}
+import { AuthAPI } from "./authApi";
+import type {
+  AuthState,
+  LoginRequest,
+  SignupRequest,
+  AuthSuccessResponse,
+  AuthErrorResponse,
+  FormErrors,
+} from "../../types/auth.types";
 
 // Initial state
 const initialState: AuthState = {
   user: null,
   token: localStorage.getItem("token"),
   loading: false,
-  error: null,
+  errors: {},
+  message: null,
 };
 
-// Slice
+// Helper function to extract errors from response
+const extractErrors = (errorResponse: any): FormErrors => {
+  if (errorResponse?.errors && typeof errorResponse.errors === "object") {
+    return errorResponse.errors;
+  }
+  return {};
+};
+
+// Async thunks
+export const loginUser = createAsyncThunk<
+  AuthSuccessResponse,
+  LoginRequest,
+  { rejectValue: AuthErrorResponse }
+>("auth/login", async (credentials, { rejectWithValue }) => {
+  try {
+    return await AuthAPI.login(credentials);
+  } catch (error: any) {
+    const errorData = error.response?.data;
+    return rejectWithValue({
+      status: errorData?.status || "fail",
+      message: errorData?.message || "Login failed",
+      errors: errorData?.errors || {},
+    });
+  }
+});
+
+export const signupUser = createAsyncThunk<
+  AuthSuccessResponse,
+  SignupRequest,
+  { rejectValue: AuthErrorResponse }
+>("auth/signup", async (userData, { rejectWithValue }) => {
+  try {
+    return await AuthAPI.signup(userData);
+  } catch (error: any) {
+    const errorData = error.response?.data;
+    console.log("error data:: ", errorData);
+    return rejectWithValue({
+      status: errorData?.status || "fail",
+      message: errorData?.message || "Signup failed",
+      errors: errorData?.error || {},
+    });
+  }
+});
+
+export const getProfile = createAsyncThunk<
+  AuthSuccessResponse,
+  string,
+  { rejectValue: AuthErrorResponse }
+>("auth/profile", async (token, { rejectWithValue }) => {
+  try {
+    const response = await AuthAPI.getProfile(token);
+    return {
+      status: "success",
+      message: "Profile loaded successfully",
+      data: response.data!,
+    };
+  } catch (error: any) {
+    const errorData = error.response?.data;
+    return rejectWithValue({
+      status: errorData?.status || "fail",
+      message: errorData?.message || "Failed to load profile",
+    });
+  }
+});
+
+// Auth slice
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -65,49 +93,87 @@ const authSlice = createSlice({
     logout: (state) => {
       state.user = null;
       state.token = null;
+      state.errors = {};
+      state.message = null;
       localStorage.removeItem("token");
+    },
+    clearErrors: (state) => {
+      state.errors = {};
+      state.message = null;
+    },
+    setFieldError: (
+      state,
+      action: PayloadAction<{ field: string; error: string }>
+    ) => {
+      state.errors[action.payload.field] = action.payload.error;
+    },
+    clearFieldError: (state, action: PayloadAction<string>) => {
+      delete state.errors[action.payload];
     },
   },
   extraReducers: (builder) => {
     builder
-
-      // login
+      // Login cases
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
-        state.error = null;
+        state.errors = {};
+        state.message = null;
       })
-      .addCase(
-        loginUser.fulfilled,
-        (state, action: PayloadAction<AuthResponse>) => {
-          state.loading = false;
-          state.user = action.payload.data;
-          state.token = action.payload.token;
+      .addCase(loginUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.data;
+        state.token = action.payload.token || null;
+        state.message = action.payload.message;
+
+        if (action.payload.token) {
           localStorage.setItem("token", action.payload.token);
         }
-      )
+      })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.message = action.payload?.message || "Login failed";
+        state.errors = extractErrors(action.payload);
       })
 
-      // signup
+      // Signup cases
       .addCase(signupUser.pending, (state) => {
         state.loading = true;
-        state.error = null;
+        state.errors = {};
+        state.message = null;
       })
-      .addCase(
-        signupUser.fulfilled,
-        (state, action: PayloadAction<signUpResponse>) => {
-          state.loading = false;
-          state.user = action.payload.data.data;
-        }
-      )
+      .addCase(signupUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.data;
+        state.message = action.payload.message;
+        // Note: Signup typically doesn't return a token until email is verified
+      })
       .addCase(signupUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.message = action.payload?.message || "Signup failed";
+        state.errors = extractErrors(action.payload);
+      })
+
+      // Profile cases
+      .addCase(getProfile.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.data;
+      })
+      .addCase(getProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.message = action.payload?.message || "Failed to load profile";
+        // If profile load fails, user might need to login again
+        if (action.payload?.status === "error") {
+          state.user = null;
+          state.token = null;
+          localStorage.removeItem("token");
+        }
       });
   },
 });
 
-export const { logout } = authSlice.actions;
+export const { logout, clearErrors, setFieldError, clearFieldError } =
+  authSlice.actions;
 export default authSlice.reducer;

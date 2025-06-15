@@ -1,55 +1,56 @@
-import axiosInstance from "../../services/axiosInstance";
+// api/auth.api.ts
+import axiosInstance from "../../services/axiosInstance.ts";
+import type {
+  LoginRequest,
+  SignupRequest,
+  AuthSuccessResponse,
+  AuthErrorResponse,
+  User,
+  ApiResponse,
+} from "../../types/auth.types.ts";
 
-// types
-export interface AuthCredentials {
-  email: string;
-  password: string;
+export class AuthAPI {
+  static async login(credentials: LoginRequest): Promise<AuthSuccessResponse> {
+    // Simulate delay for better UX
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    const response = await axiosInstance.post<AuthSuccessResponse>(
+      "/api/auth/login",
+      credentials
+    );
+
+    return response.data;
+  }
+
+  static async signup(userData: SignupRequest): Promise<AuthSuccessResponse> {
+    const response = await axiosInstance.post<AuthSuccessResponse>(
+      "/api/auth/signup",
+      userData
+    );
+
+    return response.data;
+  }
+
+  static async getProfile(token: string): Promise<ApiResponse<User>> {
+    const response = await axiosInstance.get<ApiResponse<User>>(
+      "/api/auth/me",
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      }
+    );
+
+    return response.data;
+  }
+
+  static async verifyEmail(token: string): Promise<ApiResponse<User>> {
+    const response = await axiosInstance.post<ApiResponse<User>>(
+      `/api/auth/verify-email/${token}`
+    );
+
+    return response.data;
+  }
 }
-
-export interface SignupUser {
-  // id: number;
-  firstName: string;
-  middleName?: string;
-  lastName?: string;
-  email: string;
-  password: string;
-}
-
-export interface AuthResponse {
-  data: SignupUser;
-  token: string;
-  status: string;
-}
-
-export interface signUpResponse {
-  data: {
-    data: SignupUser;
-    message: string;
-    status: string;
-  };
-}
-
-// login
-export const loginAPI = async ({
-  email,
-  password,
-}: AuthCredentials): Promise<AuthResponse> => {
-  await new Promise((res) => setTimeout(res, 500)); // simulate delay
-  const response = await axiosInstance.post<AuthResponse>("/api/auth/login", {
-    email,
-    password,
-  });
-
-  return response.data;
-};
-
-// signup
-export const signupAPI = async (data: SignupUser): Promise<signUpResponse> => {
-  const response = await axiosInstance.post<signUpResponse>(
-    "/api/auth/signup",
-    data
-  );
-
-  console.log("response from signup:: ", response);
-  return response.data;
-};
