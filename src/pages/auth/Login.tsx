@@ -19,7 +19,6 @@ const Login: React.FC = () => {
   const [touched, setTouched] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    // Clear errors when component mounts
     dispatch(clearErrors());
   }, [dispatch]);
 
