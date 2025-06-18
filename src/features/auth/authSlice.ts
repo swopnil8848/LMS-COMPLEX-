@@ -14,7 +14,7 @@ import type {
 // Initial state
 const initialState: AuthState = {
   user: null,
-  token: localStorage.getItem("token"),
+  isAuthenticated: false,
   loading: false,
   errors: {},
   message: null,
@@ -64,13 +64,13 @@ export const signupUser = createAsyncThunk<
   }
 });
 
-export const getProfile = createAsyncThunk<
+export const getMe = createAsyncThunk<
   AuthSuccessResponse,
-  string,
+  void,
   { rejectValue: AuthErrorResponse }
->("auth/profile", async (token, { rejectWithValue }) => {
+>("auth/profile", async (_, { rejectWithValue }) => {
   try {
-    const response = await AuthAPI.getProfile(token);
+    const response = await AuthAPI.getMe();
     return {
       status: "success",
       message: "Profile loaded successfully",
@@ -92,7 +92,7 @@ const authSlice = createSlice({
   reducers: {
     logout: (state) => {
       state.user = null;
-      state.token = null;
+      // state.token = null;
       state.errors = {};
       state.message = null;
       localStorage.removeItem("token");
@@ -122,8 +122,8 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload.data;
-        state.token = action.payload.token || null;
         state.message = action.payload.message;
+        state.isAuthenticated = true;
 
         if (action.payload.token) {
           localStorage.setItem("token", action.payload.token);
@@ -133,6 +133,7 @@ const authSlice = createSlice({
         state.loading = false;
         state.message = action.payload?.message || "Login failed";
         state.errors = extractErrors(action.payload);
+        state.isAuthenticated = false;
       })
 
       // Signup cases
@@ -145,7 +146,6 @@ const authSlice = createSlice({
         state.loading = false;
         state.user = action.payload.data;
         state.message = action.payload.message;
-        // Note: Signup typically doesn't return a token until email is verified
       })
       .addCase(signupUser.rejected, (state, action) => {
         state.loading = false;
@@ -154,20 +154,21 @@ const authSlice = createSlice({
       })
 
       // Profile cases
-      .addCase(getProfile.pending, (state) => {
+      .addCase(getMe.pending, (state) => {
         state.loading = true;
       })
-      .addCase(getProfile.fulfilled, (state, action) => {
+      .addCase(getMe.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload.data;
+        state.isAuthenticated = true;
       })
-      .addCase(getProfile.rejected, (state, action) => {
+      .addCase(getMe.rejected, (state, action) => {
         state.loading = false;
         state.message = action.payload?.message || "Failed to load profile";
         // If profile load fails, user might need to login again
         if (action.payload?.status === "error") {
           state.user = null;
-          state.token = null;
+          state.isAuthenticated = false;
           localStorage.removeItem("token");
         }
       });

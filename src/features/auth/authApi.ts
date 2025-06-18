@@ -31,7 +31,13 @@ export class AuthAPI {
     return response.data;
   }
 
-  static async getProfile(token: string): Promise<ApiResponse<User>> {
+  static async getMe(): Promise<ApiResponse<User>> {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      throw new Error("No authentication token found");
+    }
+
     const response = await axiosInstance.get<ApiResponse<User>>(
       "/api/auth/me",
       {

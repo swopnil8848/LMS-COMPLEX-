@@ -56,7 +56,7 @@ export type AuthErrorResponse = ValidationErrorResponse | GeneralErrorResponse;
 // Redux state types
 export interface AuthState {
   user: User | null;
-  token: string | null;
+  isAuthenticated: boolean;
   loading: boolean;
   errors: Record<string, string>;
   message: string | null;
