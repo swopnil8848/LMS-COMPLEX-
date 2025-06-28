@@ -8,6 +8,7 @@ import Signup from '../pages/auth/Signup';
 import DashboardHome from '../pages/dashboard/DashboardHome';
 
 import ProtectedRoute from './ProtectedRoute';
+import ForgotPassword from '../pages/home/ForgotPassword';
 
 const AppRoutes = () => {
   return (
@@ -23,6 +24,7 @@ const AppRoutes = () => {
 
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/forgotpassword" element={<ForgotPassword/>} />
     </Routes>
   );
 };
