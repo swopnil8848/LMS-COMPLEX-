@@ -8,7 +8,7 @@ import Signup from '../pages/auth/Signup';
 import DashboardHome from '../pages/dashboard/DashboardHome';
 
 import ProtectedRoute from './ProtectedRoute';
-import ForgotPassword from '../pages/home/ForgotPassword';
+import ForgotPassword from '../pages/auth/ForgotPassword';
 
 const AppRoutes = () => {
   return (
