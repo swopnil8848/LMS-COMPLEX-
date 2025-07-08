@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import type { AppDispatch, RootState } from "../../app/store";
-import { loginUser, clearErrors, clearFieldError } from "../../features/auth/authSlice";
+import { loginUser, clearErrors, clearFieldError, resetPassword } from "../../features/auth/authSlice";
 import type { LoginRequest } from "../../types/auth.types";
 
 const Login: React.FC = () => {
@@ -181,7 +181,7 @@ const Login: React.FC = () => {
                   </p>
                 )}
                 <div className=" w-full mt-4 md:mt-6 lg:mt-6 flex justify-end ">
-                  <p onClick={() => navigate("/forgotPassword")} className="text-slate-600 hover:text-blue-500 font-medium  hover:no-underline transition-all duration-200 cursor-pointer w-fit ">Forgot password?</p></div>
+                  <p onClick={() => navigate("/forgot-password")} className="text-slate-600 hover:text-blue-500 font-medium  hover:no-underline transition-all duration-200 cursor-pointer w-fit ">Forgot password?</p></div>
                
               </div>
               

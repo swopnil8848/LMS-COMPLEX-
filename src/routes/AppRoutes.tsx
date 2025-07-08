@@ -9,6 +9,8 @@ import DashboardHome from '../pages/dashboard/DashboardHome';
 
 import ProtectedRoute from './ProtectedRoute';
 import NotFound from '../pages/errors/NotFound';
+import ResetPassword from '../pages/auth/ResetPassword';
+import ForgotPassword from '../pages/auth/ForgotPassword';
 // import ForgotPassword from '../pages/auth/ForgotPassword';
 
 const AppRoutes = () => {
@@ -25,7 +27,10 @@ const AppRoutes = () => {
 
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
-      {/* <Route path="/forgotpassword" element={<ForgotPassword/>} /> */}
+
+
+      <Route path="/forgot-password" element={<ForgotPassword/>} />
+      <Route path="/reset-password/:resetToken" element={<ResetPassword/>} />
 
       <Route path="*" element={<NotFound />} />
     </Routes>

@@ -9,6 +9,11 @@ import type {
   AuthSuccessResponse,
   AuthErrorResponse,
   FormErrors,
+  SimpleAPIResponse,
+  forgotPasswordRequest,
+  ApiResponse,
+  User,
+  ResetPasswordPayload,
 } from "../../types/auth.types";
 
 // Initial state
@@ -84,6 +89,43 @@ export const getMe = createAsyncThunk<
     });
   }
 });
+
+export const forgotPassword = createAsyncThunk<
+  SimpleAPIResponse,
+  forgotPasswordRequest,
+  { rejectValue: AuthErrorResponse }
+>("auth/forgot-password", async (email, { rejectWithValue }) => {
+  try {
+    const response = await AuthAPI.forgotPassword(email);
+    return response as SimpleAPIResponse;
+  } catch (error: any) {
+    const errorData = error.response?.data;
+    return rejectWithValue({
+      status: errorData?.status || "fail",
+      message: errorData?.message || "Failed to send email",
+    });
+  }
+});
+
+export const resetPassword = createAsyncThunk<
+  AuthSuccessResponse,
+  ResetPasswordPayload,
+  { rejectValue: ApiResponse<null> }
+>(
+  "auth/reset-password",
+  async (data: ResetPasswordPayload, { rejectWithValue }) => {
+    try {
+      const response = await AuthAPI.resetPassword(data);
+      return response;
+    } catch (error: any) {
+      const errorData = error.response?.data;
+      return rejectWithValue({
+        status: errorData?.status || "fail",
+        message: errorData?.message || "Failed to reset password",
+      });
+    }
+  }
+);
 
 // Auth slice
 const authSlice = createSlice({
@@ -171,6 +213,42 @@ const authSlice = createSlice({
           state.isAuthenticated = false;
           localStorage.removeItem("token");
         }
+      })
+
+      .addCase(forgotPassword.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(forgotPassword.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = null;
+        state.message = action.payload.message;
+        state.isAuthenticated = false;
+      })
+      .addCase(forgotPassword.rejected, (state, action) => {
+        state.loading = false;
+        state.user = null;
+        state.isAuthenticated = false;
+        state.message = action.payload?.message || "Failed Sending Email";
+      })
+
+      .addCase(resetPassword.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(resetPassword.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.data!;
+        state.message = action.payload.message || "Password Reset Sucessfull";
+        state.isAuthenticated = true;
+
+        if (action.payload.token) {
+          localStorage.setItem("token", action.payload.token);
+        }
+      })
+      .addCase(resetPassword.rejected, (state, action) => {
+        state.loading = false;
+        state.user = null;
+        state.isAuthenticated = false;
+        state.message = action.payload?.message || "Reset Password Failed!";
       });
   },
 });

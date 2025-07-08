@@ -51,6 +51,20 @@ export interface GeneralErrorResponse {
   message: string;
 }
 
+export interface SimpleAPIResponse {
+  status: "succes" | "fail";
+  message: string;
+}
+
+export interface forgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordPayload {
+  resetToken: string;
+  password: string;
+}
+
 export type AuthErrorResponse = ValidationErrorResponse | GeneralErrorResponse;
 
 // Redux state types

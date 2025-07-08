@@ -7,6 +7,9 @@ import type {
   AuthErrorResponse,
   User,
   ApiResponse,
+  SimpleAPIResponse,
+  forgotPasswordRequest,
+  ResetPasswordPayload,
 } from "../../types/auth.types.ts";
 
 export class AuthAPI {
@@ -44,6 +47,42 @@ export class AuthAPI {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      }
+    );
+
+    return response.data;
+  }
+
+  static async forgotPassword(
+    data: forgotPasswordRequest
+  ): Promise<SimpleAPIResponse> {
+    const response = await axiosInstance.patch<SimpleAPIResponse>(
+      "/api/auth/forgot-password",
+      { email: data.email },
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      }
+    );
+
+    console.log("response fogort password:: ", response);
+
+    return response.data;
+  }
+
+  static async resetPassword(
+    data: ResetPasswordPayload
+  ): Promise<AuthSuccessResponse> {
+    const response = await axiosInstance.patch<AuthSuccessResponse>(
+      `/api/auth/reset-password/${data.resetToken}`,
+      { password: data.password },
+      {
+        headers: {
+          "Content-Type": "application/json",
         },
         withCredentials: true,
       }
