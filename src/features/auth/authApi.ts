@@ -4,7 +4,6 @@ import type {
   LoginRequest,
   SignupRequest,
   AuthSuccessResponse,
-  AuthErrorResponse,
   User,
   ApiResponse,
   SimpleAPIResponse,

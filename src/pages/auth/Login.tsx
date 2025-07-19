@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import type { AppDispatch, RootState } from "../../app/store";
-import { loginUser, clearErrors, clearFieldError, resetPassword } from "../../features/auth/authSlice";
+import { loginUser, clearErrors, clearFieldError } from "../../features/auth/authSlice";
 import type { LoginRequest } from "../../types/auth.types";
 
 const Login: React.FC = () => {

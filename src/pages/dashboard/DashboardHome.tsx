@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 
 const DashboardHome = () => {
   //example of how to get data in page (yeman)
-  const { isAuthenticated, loading,user } = useSelector((state: RootState) => state.auth);
+  const { isAuthenticated,user } = useSelector((state: RootState) => state.auth);
 
   // example (yeman)
   console.log("isAuthenticated:: ",isAuthenticated);

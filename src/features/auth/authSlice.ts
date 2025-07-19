@@ -12,7 +12,6 @@ import type {
   SimpleAPIResponse,
   forgotPasswordRequest,
   ApiResponse,
-  User,
   ResetPasswordPayload,
 } from "../../types/auth.types";
 
