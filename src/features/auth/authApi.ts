@@ -16,9 +16,17 @@ export class AuthAPI {
     // Simulate delay for better UX
     await new Promise((resolve) => setTimeout(resolve, 500));
 
+    console.log("axios instance:: ",axiosInstance)
+
     const response = await axiosInstance.post<AuthSuccessResponse>(
       "/api/auth/login",
-      credentials
+      credentials,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      }
     );
 
     return response.data;

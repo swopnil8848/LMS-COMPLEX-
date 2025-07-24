@@ -54,8 +54,16 @@ const Login: React.FC = () => {
     });
 
     try {
-      await dispatch(loginUser(formData)).unwrap();
-      navigate("/dashboard");
+      const response = await dispatch(loginUser(formData)).unwrap();
+
+      console.log("response:: ",response.data.institution.code)
+
+      const subdomain = response.data.institution.code;
+
+      // // Redirect to subdomain dashboard
+      window.location.href = `http://${subdomain}.localhost:5173/dashboard`; 
+
+      // navigate("/dashboard");
     } catch (error) {
       // Error is handled by the rejected case in the slice
       console.error("Login failed:", error);

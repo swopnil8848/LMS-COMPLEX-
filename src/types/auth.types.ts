@@ -1,5 +1,7 @@
 // types/auth.types.ts
 
+import type { Institution } from "./institute.types";
+
 export interface User {
   id: number;
   firstName: string;
@@ -13,6 +15,7 @@ export interface User {
   passwordChangedAt?: string | null;
   emailVerificationToken?: string | null;
   passwordResetToken?: string | null;
+  institution?:Institution;
 }
 
 export type UserRole = "student" | "admin" | "teacher";
@@ -37,6 +40,7 @@ export interface AuthSuccessResponse {
   status: "success";
   message: string;
   data: User;
+  institution?:Institution;
   token?: string;
 }
 
@@ -71,6 +75,7 @@ export type AuthErrorResponse = ValidationErrorResponse | GeneralErrorResponse;
 export interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
+  
   loading: boolean;
   errors: Record<string, string>;
   message: string | null;
