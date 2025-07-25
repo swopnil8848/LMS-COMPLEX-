@@ -65,16 +65,6 @@ const DashboardHome = () => {
                   </span>
                 </div>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-500">Member Since:</span>
-                <span className="text-sm text-gray-900">
-                  {new Date(user.createdAt).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}
-                </span>
-              </div>
             </div>
           </div>
         </div>
@@ -117,11 +107,13 @@ const DashboardHome = () => {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-500">Website:</span>
-                  <span className="text-sm text-blue-600 hover:text-blue-800">
-                    <a href={user.institution.website} target="_blank" rel="noopener noreferrer">
-                      Visit Website
-                    </a>
-                  </span>
+                  {user.institution.website
+                    && <span className="text-sm text-blue-600 hover:text-blue-800">
+                      <a href={user.institution.website} target="_blank" rel="noopener noreferrer">
+                        Visit Website
+                      </a>
+                    </span>
+                  }
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-500">Status:</span>

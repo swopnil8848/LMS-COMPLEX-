@@ -58,11 +58,11 @@ const Login: React.FC = () => {
 
       const subdomain = response?.data?.institution?.code;
 
-      // // Redirect to subdomain dashboard
+      // Redirect to subdomain dashboard
       if(subdomain){
         window.location.href = `http://${subdomain}.localhost:5173/dashboard`; 
       }else{
-        window.location.href = `http://localhost:5173/dashboard`
+        navigate("/dashboard");
       }
 
       // navigate("/dashboard");
